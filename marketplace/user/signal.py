@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from user.models import UserProfile, Address
 
 
-@receiver(post_save, sender=User):
+@receiver(post_save, sender=User)
 def create_user_profile_and_address(sender, instance, created, **kwargs):
     """
     Create user profile and address when user is created.

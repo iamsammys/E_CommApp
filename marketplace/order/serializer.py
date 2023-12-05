@@ -12,7 +12,6 @@ class OrderSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         """
-        Validate method for OrderSerializer
+        Validate method for OrderSerializer                                                                                                                                 
         """
         user = data.get('user')
-        
