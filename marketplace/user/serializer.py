@@ -38,8 +38,7 @@ class WriteAddressSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = Address
-        except = ('id',)
-
+        fields = ['user', 'house_no', ]
     def update(self, validated_data):
         """
         Update method for AddressSerializer
