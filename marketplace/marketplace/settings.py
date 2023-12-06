@@ -141,3 +141,5 @@ SIMPLE_JWT = {
     "REFRESH_TOKEN_LIFETIME": timedelta(days=2),
     "AUTH_HEADER_TYPES": ('Token',),
 }
+
+APPEND_SLASH = False

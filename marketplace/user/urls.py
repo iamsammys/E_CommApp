@@ -6,4 +6,6 @@ router = DefaultRouter()
 router.register(r'profile', ProfileViewSet, basename='profile')
 router.register(r'address', AddressViewSet, basename='address')
 
-urlpatterns = router.urls
+urlpatterns = [
+    path(' profiles/', ProfileViewSet.as_view({'get': 'list'}))]
+urlpatterns += router.urls

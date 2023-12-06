@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import UserProfile, Address
+from django_countries.serializers import CountryFieldMixin
 
 class ProfileSerializer(serializers.ModelSerializer):
     """
@@ -24,7 +25,7 @@ class ProfileSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Profile already exists.")
         return data
 
-class ReadAddressSerializer(serializers.ModelSerializer):
+class ReadAddressSerializer(CountryFieldMixin, serializers.ModelSerializer):
     """
     Address serializer
     """

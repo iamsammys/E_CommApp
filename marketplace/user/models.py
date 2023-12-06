@@ -27,7 +27,7 @@ class Address(BaseModel):
     """
     Address model
     """
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='address')
     house_no = models.CharField(max_length=255, blank=True, null=True)
     street = models.CharField(max_length=255, blank=True, null=True)
     state = models.CharField(max_length=255, blank=True, null=True)
