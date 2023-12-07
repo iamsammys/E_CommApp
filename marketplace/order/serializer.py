@@ -15,3 +15,9 @@ class OrderSerializer(serializers.ModelSerializer):
         Validate method for OrderSerializer                                                                                                                                 
         """
         user = data.get('user')
+
+    def create(self, validated_data):
+        """
+        Create method for OrderSerializer
+        """
+        return Order.objects.create(user=context.get('user') **validated_data)

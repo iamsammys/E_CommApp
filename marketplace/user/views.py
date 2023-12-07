@@ -1,13 +1,21 @@
+from .models import UserProfile, Address
+from .serializer import (
+    ProfileSerializer,
+    WriteAddressSerializer,
+    ReadAddressSerializer
+)
 from django.shortcuts import render
 from rest_framework import viewsets
-from .models import UserProfile, Address
-from .serializer import ProfileSerializer, WriteAddressSerializer, ReadAddressSerializer
+from rest_framework.permissions import IsAuthenticated
 
 
 class ProfileViewSet(viewsets.ModelViewSet):
     """
     Profile viewset
     """
+    permission_classes = [
+        IsAuthenticated
+    ]
     serializer_class = ProfileSerializer
 
     def get_queryset(self):
@@ -26,6 +34,9 @@ class AddressViewSet(viewsets.ModelViewSet):
     """
     Address viewset
     """
+    permission_classes = [
+        IsAuthenticated
+    ]
     def get_queryset(self):
         """
         Get queryset for AddressViewSet

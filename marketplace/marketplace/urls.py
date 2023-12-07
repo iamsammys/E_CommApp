@@ -22,5 +22,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('user/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('user/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('marketplace/api/user/', include('user.urls'))
+    path('marketplace/api/user/', include('user.urls')),
+    path('marketplace/api/', include('order.urls')),
     ]
