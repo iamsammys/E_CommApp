@@ -10,7 +10,7 @@ from product.models import Product, ProductCategory, ProductReview
 from django.contrib.auth.models import User
 
 
-class ReadProductSerializer(serializer.ModelSerializer):
+class ReadProductSerializer(serializers.ModelSerializer):
     """
     Product serializer class
     """
@@ -18,7 +18,7 @@ class ReadProductSerializer(serializer.ModelSerializer):
         model = Product
         fields = '__all__'
 
-class WriteProductSerializer(serializer.ModelSerializer):
+class WriteProductSerializer(serializers.ModelSerializer):
     """
     Product serializer class
     """
@@ -35,7 +35,7 @@ class WriteProductSerializer(serializer.ModelSerializer):
             'category',
         ]
 
-class ProductCategorySerializer(serializer.ModelSerializer):
+class ProductCategorySerializer(serializers.ModelSerializer):
     """
     Product category serializer class
 

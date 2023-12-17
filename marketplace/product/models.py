@@ -3,6 +3,16 @@ from shared.basemodel import BaseModel
 from django.contrib.auth.models import User
 
 
+class ProductCategory(BaseModel):
+    """
+    Product category models class
+    """
+    name = models.CharField(max_length=255, blank=False)
+    description = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return "[{}] {}.{}".format(self.__class__.__name__, self.name, self.id)
+    
 class Product(BaseModel):
     """
     Product models class
@@ -18,19 +28,9 @@ class Product(BaseModel):
     name = models.CharField(max_length=255, blank=False)
     description = models.TextField(blank=True, null=True)
     quantity = models.IntegerField(default=0)
-    price = models.DecimalField(decimal_places=2)
+    price = models.DecimalField(decimal_places=2, max_digits=10, default=0.00)
     image = models.ImageField(upload_to='product_images', blank=True, null=True)
-    category = models.ForeignKey('Category', on_delete=models.CASCADE, related_name='products')
-
-    def __str__(self):
-        return "[{}] {}.{}".format(self.__class__.__name__, self.name, self.id)
-    
-class ProductCategory(BaseModel):
-    """
-    Product category models class
-    """
-    name = models.CharField(max_length=255, blank=False)
-    description = models.TextField(blank=True, null=True)
+    category = models.ForeignKey(ProductCategory, on_delete=models.CASCADE, related_name='products')
 
     def __str__(self):
         return "[{}] {}.{}".format(self.__class__.__name__, self.name, self.id)

@@ -127,7 +127,7 @@ class WriteOrderSerializer(serializers.Serializer):
 
         with transaction.atomic():
             order = Order.objects.create(
-            user=user
+            user=user,
             ship_to=self.validated_data.get('ship_to'),
             cart=self.validated_data.get('cart'),
             delivery_status=validated_data.get('delivery_status')
