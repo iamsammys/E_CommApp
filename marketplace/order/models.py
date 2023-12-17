@@ -11,6 +11,7 @@ from user.models import Address
 from shared.basemodel import BaseModel
 from django.contrib.auth.models import User
 from product.models import Product
+from cart.models import Cart
 
 
 DELIVERY_STATUS = (
@@ -28,9 +29,20 @@ class Order(BaseModel):
         ship_to (Address): Shipping address
         delivery_status (str): Delivery status
     """
+    cart = models.OneToOneField(Cart,
+                                on_delete=models.PROTECT,
+                                related_name='order'
+                                )
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    ship_to = models.ForeignKey(Address, on_delete=models.PROTECT, related_name='shipping_address')
-    delivery_status = models.CharField(max_length=10, choices=DELIVERY_STATUS, default='PENDING')
+    ship_to = models.ForeignKey(Address,
+                                on_delete=models.PROTECT,
+                                related_name='shipping_address',
+                                default=None, null=True
+                                )
+    delivery_status = models.CharField(max_length=10,
+                                       choices=DELIVERY_STATUS,
+                                       default='PENDING'
+                                        )
 
 
     def __str__(self) -> str:
@@ -51,8 +63,8 @@ class Order(BaseModel):
         """
         result = 0.0
         for item in self.order_items.all():
-            result += item.total_price()
-        return 
+            result += (item.quantity * item.product.price)
+        return result
     
 class OrderItem(BaseModel):
     """
@@ -85,4 +97,4 @@ class OrderItem(BaseModel):
         Returns:
             float: Total price
         """
-        return self.price * self.quantity
+        return float(self.price * self.quantity)
