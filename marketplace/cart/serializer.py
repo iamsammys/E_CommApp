@@ -92,14 +92,18 @@ class WriteCartItemSerializer(serializers.ModelSerializer):
         Returns:
             cart_item: Cart item
         """
-        cart_item = CartItem.objects.create(user=self.context.get('user'),
+        product = validated_data['product']
+        # if cart exists then the quantity should be created and not creating a new cart
+        cart_item, create = CartItem.objects.get_or_create(user=self.context.get('user'),
                                             cart_id=self.context.get('cart_id'),
+                                            product=product,
                                             **validated_data)
+        
+        if not create:
+            cart_item.quantity += validated_data['quantity']
+            cart_item.save()
+
         return cart_item
-        
-
-        
-
 
 class CartSerializer(serializers.ModelSerializer):
     """
@@ -110,6 +114,7 @@ class CartSerializer(serializers.ModelSerializer):
         cart_items: CartItem
     """
     user = serializers.StringRelatedField()
+    cart_items = ReadCartItemSerializer(many=True, read_only=True)
 
     class Meta:
         model = Cart
@@ -147,5 +152,3 @@ class CartSerializer(serializers.ModelSerializer):
             cart: Cart
         """
         return Cart.objects.create(user=self.context.get('user'), **validated_data)
-    
-class 
