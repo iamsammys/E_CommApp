@@ -24,5 +24,6 @@ urlpatterns = [
     path('user/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('marketplace/api/user/', include('user.urls')),
     path('marketplace/api/', include('order.urls')),
-    path('marketplace/api/', include('cart.urls')),
+    path('marketplace/api/', include('cart.urls')), 
+    path('marketplace/api/', include('product.urls')),
     ]

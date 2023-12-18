@@ -55,6 +55,9 @@ class WriteCartItemSerializer(serializers.ModelSerializer):
             'created_at',
             'updated_at'
         ]
+        extra_kwargs = {
+            'quantity': {'min_value': 1}
+        }
     def validate(self, data):
         """
         Validate cart item data

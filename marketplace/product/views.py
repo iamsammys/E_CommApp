@@ -59,12 +59,16 @@ class ProductReviewView(viewsets.ModelViewSet):
         serializer_class: Product review serializer class
     """
     permission_class = [IsAuthenticated]
-    queryset = Product.objects.select_related(
-        'product',
-        'user'
-        ).filter(
-            product_id=self.kwargs.get('product_id')
-        )
+
+    def get_queryset(self):
+        """
+        Return the queryset to use
+        """
+        return (
+            ProductReview.objects.select_related('product', 'user')\
+            .filter(user=self.request.user, product=self.kwargs.get('product_id'))
+            )
+
     def get_serializer_class(self):
         """
         Return the serializer class to use
