@@ -37,7 +37,7 @@ class CartViewSet(viewsets.ModelViewSet):
         Returns:
             dict: Context
         """
-        context = super().get_context()
+        context = {}
         context['user'] = self.request.user
         return context
 
@@ -78,7 +78,7 @@ class CartItemViewSet(viewsets.ModelViewSet):
         Returns:
             dict: Serializer context
         """
-        context = super().get_serializer_context()
+        context = {}
         context['user'] = self.request.user
         context['cart_id'] = self.request.data.get('cart_id')
         return context

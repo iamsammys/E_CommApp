@@ -31,6 +31,8 @@ class ReadCartItemSerializer(serializers.ModelSerializer):
             'updated_at'
         ]
 
+        read_only_fields = '__all__'
+
 class WriteCartItemSerializer(serializers.ModelSerializer):
     """
     Write cart item serializer class
@@ -93,7 +95,7 @@ class WriteCartItemSerializer(serializers.ModelSerializer):
             cart_item: Cart item
         """
         product = validated_data['product']
-        # if cart exists then the quantity should be created and not creating a new cart
+        # if cart exists then the quantity should be increased and not creating a new cart
         cart_item, create = CartItem.objects.get_or_create(user=self.context.get('user'),
                                             cart_id=self.context.get('cart_id'),
                                             product=product,
@@ -122,24 +124,10 @@ class CartSerializer(serializers.ModelSerializer):
             'id',
             'user',
             'cart_items',
-            'total_price'
             'created_at',
             'updated_at'
         ]
-
-    def validate(self, data):
-        """
-        Validate cart data
-
-        Args:
-            data: Cart data
-
-        Returns:
-            data: Cart data
-        """
-        if Cart.objects.filter(user=data['user']).exists():
-            raise serializers.ValidationError("Cart already exists")
-        return data
+        read_only_fields = ['id', 'created_at', 'updated_at']
     
     def create(self, validated_data):
         """
@@ -152,3 +140,20 @@ class CartSerializer(serializers.ModelSerializer):
             cart: Cart
         """
         return Cart.objects.create(user=self.context.get('user'), **validated_data)
+
+    def validate(self, data):
+        """
+        Validate cart data
+
+        Args:
+            data: Cart data
+
+        Returns:
+            data: Cart data
+        """
+        user = self.context.get('user')
+        if Cart.objects.filter(user=user).exists():
+            raise serializers.ValidationError(
+                {"error": "You have an already existing cart"}
+            )
+        return data
