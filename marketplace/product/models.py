@@ -11,7 +11,7 @@ class ProductCategory(BaseModel):
     description = models.TextField(blank=True, null=True)
 
     def __str__(self):
-        return "[{}] {}.{}".format(self.__class__.__name__, self.name, self.id)
+        return "{}".format(self.name)
     
 class Product(BaseModel):
     """
@@ -33,7 +33,7 @@ class Product(BaseModel):
     category = models.ForeignKey(ProductCategory, on_delete=models.CASCADE, related_name='products')
 
     def __str__(self):
-        return "[{}] {}.{}".format(self.__class__.__name__, self.name, self.id)
+        return "{}".format(self.name)
     
 class ProductReview(BaseModel):
     """
@@ -51,4 +51,4 @@ class ProductReview(BaseModel):
     review = models.TextField(blank=True, null=True, help_text="Enter your review about the product here")
 
     def __str__(self):
-        return "[{}] {}.{}".format(self.__class__.__name__, self.user.name, self.id)
+        return "{}".format(self.user.name)

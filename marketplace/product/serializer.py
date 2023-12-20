@@ -6,7 +6,11 @@ Created on Sep 19, 2021
 """
 
 from rest_framework import serializers
-from product.models import Product, ProductCategory, ProductReview
+from product.models import (
+    Product,
+    ProductCategory,
+    ProductReview
+)
 from django.contrib.auth.models import User
 
 
@@ -14,9 +18,21 @@ class ReadProductSerializer(serializers.ModelSerializer):
     """
     Product serializer class
     """
+    category = serializers.StringRelatedField()
     class Meta:
         model = Product
         fields = '__all__'
+
+        extra_kwargs = {
+            'description': {'read_only': True},
+            'quantity': {'read_only': True},
+            'price': {'read_only': True},
+            'created_at': {'read_only': True},
+            'updated_at': {'read_only': True},
+            'id': {'read_only': True},
+            'name': {'read_only': True},
+            'image': {'read_only': True},
+        }
 
 class WriteProductSerializer(serializers.ModelSerializer):
     """
@@ -49,6 +65,8 @@ class ProductCategorySerializer(serializers.ModelSerializer):
         fields = '__all__'
     
     id = serializers.ReadOnlyField()
+    created_at = serializers.ReadOnlyField()
+    updated_at = serializers.ReadOnlyField()
 
 class ReadProductReviewSerializer(serializers.ModelSerializer):
     """
@@ -60,8 +78,8 @@ class ReadProductReviewSerializer(serializers.ModelSerializer):
         rating: Rating
         review: Review
     """
-    Product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all(), many=True)
-    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), many=True)
+    Product = ReadProductSerializer
+    user = serializers.StringRelatedField()
 
     class Meta:
         model = ProductReview
@@ -80,27 +98,35 @@ class WriteProductReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductReview
         fields = [
-            'product',
-            'user',
             'rating',
             'review',
         ]
+
     def validate(self, value):
         """
         Validate the rating
         """
-        product_id = value.get('product')
-        user = value.get('user')
+        product_id = self.context.get('product')
+        user = self.context.get('user')
         rating = value.get('rating')
 
+        print('product is {}'.format(Product.objects.filter(id=product_id).exists()))
         if not Product.objects.filter(id=product_id).exists():
-            raise serializers.ValidationError("This product does not exist, try creating the product first")
+            raise serializers.ValidationError({
+                'error': "This product does not exist, try creating the product first"
+                }
+                )
         
         if ProductReview.objects.filter(product_id=product_id, user=user).exists():
             raise serializers.ValidationError("You have already reviewed this product")
 
         if rating < 1 or rating > 5:
-            raise serializers.ValidationError("Rating must be between 1 and 5")
+            raise serializers.ValidationError({
+                'error': "Rating must be between 1 and 5"
+                }
+                )
+        
+        return value
     
     def create (self, validated_data):
         """
@@ -112,9 +138,8 @@ class WriteProductReviewSerializer(serializers.ModelSerializer):
         Returns:
             product_review: Product review
         """
-        product_id = self.context.get('product_id')
         user = self.context.get('user')
-
+        product_id = self.context.get('product_id')
         product_review = ProductReview.objects.create(
             user=user,
             product_id=product_id,

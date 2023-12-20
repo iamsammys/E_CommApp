@@ -3,7 +3,8 @@ from django.shortcuts import render
 from rest_framework import viewsets
 from product.models import (
     Product,
-    ProductCategory
+    ProductCategory,
+    ProductReview
 )
 from product.serializer import (
     ReadProductSerializer,
@@ -76,4 +77,13 @@ class ProductReviewView(viewsets.ModelViewSet):
         if self.request.method == "GET":
             return ReadProductReviewSerializer
         return WriteProductReviewSerializer
+    
+    def get_serializer_context(self):
+        """
+        Return the serializer context to use
+        """
+        return {
+            'product_id': self.kwargs.get('product_id'),
+            'user': self.request.user
+            }
     
