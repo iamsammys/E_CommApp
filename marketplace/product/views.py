@@ -82,8 +82,10 @@ class ProductReviewView(viewsets.ModelViewSet):
         """
         Return the serializer context to use
         """
-        return {
+        context = {
             'product_id': self.kwargs.get('product_id'),
             'user': self.request.user
             }
+        
+        return context
     

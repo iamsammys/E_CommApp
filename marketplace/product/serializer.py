@@ -106,11 +106,10 @@ class WriteProductReviewSerializer(serializers.ModelSerializer):
         """
         Validate the rating
         """
-        product_id = self.context.get('product')
+        product_id = self.context.get('product_id')
         user = self.context.get('user')
         rating = value.get('rating')
 
-        print('product is {}'.format(Product.objects.filter(id=product_id).exists()))
         if not Product.objects.filter(id=product_id).exists():
             raise serializers.ValidationError({
                 'error': "This product does not exist, try creating the product first"
@@ -118,7 +117,9 @@ class WriteProductReviewSerializer(serializers.ModelSerializer):
                 )
         
         if ProductReview.objects.filter(product_id=product_id, user=user).exists():
-            raise serializers.ValidationError("You have already reviewed this product")
+            raise serializers.ValidationError({
+                'error': 'You have already reviewed this product'
+                })
 
         if rating < 1 or rating > 5:
             raise serializers.ValidationError({
