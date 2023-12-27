@@ -14,26 +14,6 @@ from product.models import (
 from django.contrib.auth.models import User
 
 
-class ReadProductSerializer(serializers.ModelSerializer):
-    """
-    Product serializer class
-    """
-    category = serializers.StringRelatedField()
-    class Meta:
-        model = Product
-        fields = '__all__'
-
-        extra_kwargs = {
-            'description': {'read_only': True},
-            'quantity': {'read_only': True},
-            'price': {'read_only': True},
-            'created_at': {'read_only': True},
-            'updated_at': {'read_only': True},
-            'id': {'read_only': True},
-            'name': {'read_only': True},
-            'image': {'read_only': True},
-        }
-
 class WriteProductSerializer(serializers.ModelSerializer):
     """
     Product serializer class
@@ -78,12 +58,19 @@ class ReadProductReviewSerializer(serializers.ModelSerializer):
         rating: Rating
         review: Review
     """
-    Product = ReadProductSerializer
     user = serializers.StringRelatedField()
 
     class Meta:
         model = ProductReview
         fields = '__all__'
+
+        extra_kwargs = {
+            'created_at': {'read_only': True},
+            'updated_at': {'read_only': True},
+            'id': {'read_only': True},
+            'product': {'read_only': True},
+            'user': {'read_only': True},
+        }
 
 class WriteProductReviewSerializer(serializers.ModelSerializer):
     """
@@ -147,3 +134,34 @@ class WriteProductReviewSerializer(serializers.ModelSerializer):
             **validated_data
         )
         return product_review
+    
+class ReadProductSerializer(serializers.ModelSerializer):
+    """
+    Product serializer class
+    """
+    class Meta:
+        model = Product
+        fields = [
+            'id',
+            'name',
+            'description',
+            'quantity',
+            'price',
+            'image',
+            'category',
+            'created_at',
+            'updated_at',
+            'reviews'
+        ]
+        extra_kwargs = {
+            'description': {'read_only': True},
+            'quantity': {'read_only': True},
+            'price': {'read_only': True},
+            'created_at': {'read_only': True},
+            'updated_at': {'read_only': True},
+            'id': {'read_only': True},
+            'name': {'read_only': True},
+            'image': {'read_only': True},
+        }
+    category = serializers.StringRelatedField()
+    reviews = ReadProductReviewSerializer(many=True, read_only=True)

@@ -20,7 +20,7 @@ class ProductView(viewsets.ModelViewSet):
     """
     Product view class
     """
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def get_serializer_class(self):
         """
@@ -67,7 +67,7 @@ class ProductReviewView(viewsets.ModelViewSet):
         """
         return (
             ProductReview.objects.select_related('product', 'user')\
-            .filter(user=self.request.user, product=self.kwargs.get('product_id'))
+            .filter(product=self.kwargs.get('product_id'))
             )
 
     def get_serializer_class(self):

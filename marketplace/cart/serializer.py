@@ -3,7 +3,7 @@ from .models import Cart, CartItem
 from product.models import Product
 from product.serializer import ReadProductSerializer
 
-
+ 
 class ReadCartItemSerializer(serializers.ModelSerializer):
     """
     Read cart item serializer class
@@ -15,7 +15,6 @@ class ReadCartItemSerializer(serializers.ModelSerializer):
         price: int
     """
     product = ReadProductSerializer()
-    user = serializers.StringRelatedField(read_only=True)
 
     class Meta:
         """
@@ -31,7 +30,14 @@ class ReadCartItemSerializer(serializers.ModelSerializer):
             'updated_at'
         ]
 
-        read_only_fields = '__all__'
+        read_only_fields = [
+            'id',
+            'cart',
+            'created_at',
+            'updated_at',
+            'product',
+            'quantity'
+        ]
 
 class WriteCartItemSerializer(serializers.ModelSerializer):
     """
@@ -42,7 +48,7 @@ class WriteCartItemSerializer(serializers.ModelSerializer):
         cart: Cart
         quantity: int
         price: int
-    """
+    """    
     class Meta:
         """
         Cart item serializer meta class
@@ -50,14 +56,12 @@ class WriteCartItemSerializer(serializers.ModelSerializer):
         model = CartItem
         fields = [
             'product',
-            'cart',
             'quantity',
-            'created_at',
-            'updated_at'
         ]
         extra_kwargs = {
             'quantity': {'min_value': 1}
         }
+
     def validate(self, data):
         """
         Validate cart item data
@@ -69,21 +73,30 @@ class WriteCartItemSerializer(serializers.ModelSerializer):
             data: Cart item data
         """
         if not Cart.objects.filter(user=self.context.get('user'),
-                                   pk=self.context.get('cart_id')).exists():
-            raise serializers.ValidationError("Cart does not exist")
+                                   pk=self.context.get('cart')).exists():
+            raise serializers.ValidationError({
+                'error': "Cart does not exist"
+                }
+                )
         
         
         product = data['product']
 
         try:
-            cart_item = CartItem.objects.get(cart_id=self.context.get('cart_id'),
+            cart_item = CartItem.objects.get(cart=self.context.get('cart'),
                                                 product=product)
             quantity = cart_item.quantity
         except CartItem.DoesNotExist:
             quantity = 0
 
         if quantity + data['quantity'] > product.quantity:
-            raise serializers.ValidationError("Product quantity exceeded")
+            total_products = product.quantity
+            available_products = total_products - cart_item.quantity
+            raise serializers.ValidationError({
+                'error': 'Product quantity exceeded',
+                'total products quantity': total_products,
+                'available quantity': available_products
+                })
         
         return data
     
@@ -97,19 +110,17 @@ class WriteCartItemSerializer(serializers.ModelSerializer):
         Returns:
             cart_item: Cart item
         """
-        product = validated_data['product']
+        cart = Cart.objects.get(pk=self.context.get('cart'))
         # if cart exists then the quantity should be increased and not creating a new cart
-        cart_item, create = CartItem.objects.get_or_create(user=self.context.get('user'),
-                                            cart_id=self.context.get('cart_id'),
-                                            product=product,
-                                            **validated_data)
-        
-        if not create:
+        try:
+            cart_item = CartItem.objects.get(cart=cart,
+                                             product=validated_data['product'])
             cart_item.quantity += validated_data['quantity']
             cart_item.save()
-
+        except CartItem.DoesNotExist:
+            cart_item = CartItem.objects.create(cart=cart, **validated_data)
         return cart_item
-
+    
 class CartSerializer(serializers.ModelSerializer):
     """
     Cart serializer class

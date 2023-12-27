@@ -80,5 +80,5 @@ class CartItemViewSet(viewsets.ModelViewSet):
         """
         context = {}
         context['user'] = self.request.user
-        context['cart_id'] = self.request.data.get('cart_id')
+        context['cart'] = self.kwargs.get('cart_id')
         return context

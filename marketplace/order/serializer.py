@@ -13,8 +13,12 @@ from .models import (
 from rest_framework.relations import StringRelatedField
 from django.db import transaction
 from user.serializer import ReadAddressSerializer
-from cart.models import Cart
+from cart.models import(
+    Cart,
+    CartItem
+)
 from user.models import Address
+from product.models import Product
 
 class ReadOrderItemSerializer(serializers.ModelSerializer):
     """
@@ -107,7 +111,6 @@ class WriteOrderSerializer(serializers.Serializer):
 
         if cart.first().items.count() < 1:
             raise serializers.ValidationError("Cart is empty.")
-
         return data
     
     def __init__(self, *args, **kwargs):
@@ -132,8 +135,8 @@ class WriteOrderSerializer(serializers.Serializer):
             cart=self.validated_data.get('cart'),
             delivery_status=validated_data.get('delivery_status')
             )
-            cart_items = CartItems.object.filter(user=self.context.get('user'),
-                                                 pk=request.user.cart.id)
+            cart_items = CartItem.object.filter(user=self.context.get('user'),
+                                                 pk=user.cart.id)
             order_items = [
                 OrderItem(
                     order=order,
@@ -149,7 +152,7 @@ class WriteOrderSerializer(serializers.Serializer):
                 if product.quantity < item.quantity:
                     raise serializers.ValidationError(
                         {
-                        'error': "your for this product {} order is more than\
+                        'error': "your order for this product {} is more than\
                         the available quantity".format(product.name)
                         }
                         )
